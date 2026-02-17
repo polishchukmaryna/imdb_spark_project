@@ -1,2 +1,2 @@
 # imdb_spark_project
-Big Data Project (Polishchuk, Hoshovska, Pavluh, Napadailo)
+Big Data Project (Polishchuk, Hoshovska, Pavliukh, Napadailo)
