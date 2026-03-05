@@ -1,0 +1,8 @@
+services:
+  spark-job:
+    build: .
+    volumes:
+      - ./data:/app/data:ro
+      - ./output:/app/output
+    environment:
+      - PYSPARK_PYTHON=python3
