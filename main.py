@@ -1,6 +1,7 @@
 from pyspark.sql import SparkSession
 
 from src.extraction import extract_all
+from src.preprocessing import preprocess_all
 
 DATA_PATH = "/app/data"
 OUTPUT_PATH = "/app/output"
@@ -17,6 +18,7 @@ def main():
     )
     spark.sparkContext.setLogLevel("WARN")
     raw = extract_all(spark, DATA_PATH)
+    clean = preprocess_all(raw)
 
     spark.stop()
 
