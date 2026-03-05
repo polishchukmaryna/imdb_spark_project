@@ -1,0 +1,64 @@
+from pyspark.sql.types import (
+    StructType, StructField, StringType, IntegerType, FloatType
+)
+
+
+NAME_BASICS_SCHEMA = StructType([
+    StructField("nconst", StringType(), True),
+    StructField("primaryName", StringType(), True),
+    StructField("birthYear", IntegerType(), True),
+    StructField("deathYear", IntegerType(), True),
+    StructField("primaryProfession", StringType(), True),
+    StructField("knownForTitles", StringType(), True),
+])
+
+TITLE_AKAS_SCHEMA = StructType([
+    StructField("titleId", StringType(), True),
+    StructField("ordering", IntegerType(), True),
+    StructField("title", StringType(), True),
+    StructField("region", StringType(), True),
+    StructField("language", StringType(), True),
+    StructField("types", StringType(), True),
+    StructField("attributes", StringType(), True),
+    StructField("isOriginalTitle", IntegerType(), True),
+])
+
+TITLE_BASICS_SCHEMA = StructType([
+    StructField("tconst", StringType(), True),
+    StructField("titleType", StringType(), True),
+    StructField("primaryTitle", StringType(), True),
+    StructField("originalTitle", StringType(), True),
+    StructField("isAdult", IntegerType(), True),
+    StructField("startYear", IntegerType(), True),
+    StructField("endYear", IntegerType(), True),
+    StructField("runtimeMinutes", IntegerType(), True),
+    StructField("genres", StringType(), True),
+])
+
+TITLE_CREW_SCHEMA = StructType([
+    StructField("tconst", StringType(), True),
+    StructField("directors", StringType(), True),
+    StructField("writers", StringType(), True),
+])
+
+TITLE_EPISODE_SCHEMA = StructType([
+    StructField("tconst", StringType(), True),
+    StructField("parentTconst", StringType(), True),
+    StructField("seasonNumber", IntegerType(), True),
+    StructField("episodeNumber", IntegerType(), True),
+])
+
+TITLE_PRINCIPALS_SCHEMA = StructType([
+    StructField("tconst", StringType(), True),
+    StructField("ordering", IntegerType(), True),
+    StructField("nconst", StringType(), True),
+    StructField("category", StringType(), True),
+    StructField("job", StringType(), True),
+    StructField("characters", StringType(), True),
+])
+
+TITLE_RATINGS_SCHEMA = StructType([
+    StructField("tconst", StringType(), True),
+    StructField("averageRating", FloatType(), True),
+    StructField("numVotes", IntegerType(), True),
+])
