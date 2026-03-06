@@ -33,11 +33,52 @@ def _clean_title_basics(df: DataFrame) -> DataFrame:
     return df
 
 
+def _clean_title_ratings(df: DataFrame) -> DataFrame:
+    df = df.dropna(subset=["tconst"])
+    df = df.dropDuplicates(["tconst"])
+    return df
+
+
+def _clean_title_akas(df: DataFrame) -> DataFrame:
+    df = df.drop("attributes")
+    df = df.dropna(subset=["titleId"])
+    df = df.dropDuplicates(["titleId", "ordering"])
+    return df
+
+
+def _clean_title_crew(df: DataFrame) -> DataFrame:
+    df = df.dropna(subset=["tconst"])
+    df = df.dropDuplicates(["tconst"])
+    return df
+
+
+def _clean_title_episode(df: DataFrame) -> DataFrame:
+    df = df.dropna(subset=["tconst", "parentTconst"])
+    df = df.dropDuplicates(["tconst"])
+    return df
+
+
+def _clean_title_principals(df: DataFrame) -> DataFrame:
+    df = df.dropna(subset=["tconst", "nconst"])
+    df = df.dropDuplicates(["tconst", "ordering"])
+    return df
+
+
+def _clean_name_basics(df: DataFrame) -> DataFrame:
+    df = df.dropna(subset=["nconst", "primaryName"])
+    df = df.dropDuplicates(["nconst"])
+    return df
+
+
 _CLEANERS = {
     "title_basics": _clean_title_basics,
-    # TODO implement the rest of cleaners
+    "title_ratings": _clean_title_ratings,
+    "title_akas": _clean_title_akas,
+    "title_crew": _clean_title_crew,
+    "title_episode": _clean_title_episode,
+    "title_principals": _clean_title_principals,
+    "name_basics": _clean_name_basics,
 }
-
 
 def preprocess_all(raw: dict) -> dict:
     print("\nStart preprocessing...")
