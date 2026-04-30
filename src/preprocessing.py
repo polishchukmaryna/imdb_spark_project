@@ -90,6 +90,7 @@ def preprocess_all(raw: dict) -> dict:
             _print_stats(name, df)
             df = cleaner(df)
             print(f"\n    {name} AFTER cleaning")
+        df = df.cache()
         _print_stats(name, df)
         clean[name] = df
     print("\nFinish preprocessing.")
