@@ -13,16 +13,13 @@ def main():
         SparkSession.builder
         .appName("IMDB Analysis")
         .master("local[*]")
-        .config("spark.driver.memory", "4g")
-        .config("spark.sql.shuffle.partitions", "8")
+        .config("spark.driver.memory", "8g")
+        .config("spark.sql.shuffle.partitions", "100")
         .getOrCreate()
     )
     spark.sparkContext.setLogLevel("WARN")
     raw = extract_all(spark, DATA_PATH)
     clean = preprocess_all(raw)
-
-    for table in clean.values():
-        table.cache()
 
     studio.run(clean, OUTPUT_PATH)
     distributor.run(clean, OUTPUT_PATH)
