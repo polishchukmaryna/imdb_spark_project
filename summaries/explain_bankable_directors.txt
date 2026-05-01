@@ -1,0 +1,340 @@
+  name_basics: 6 columns
+root
+ |-- nconst: string (nullable = true)
+ |-- primaryName: string (nullable = true)
+ |-- birthYear: integer (nullable = true)
+ |-- deathYear: integer (nullable = true)
+ |-- primaryProfession: string (nullable = true)
+ |-- knownForTitles: string (nullable = true)
+
+  title_akas: 8 columns
+root
+ |-- titleId: string (nullable = true)
+ |-- ordering: integer (nullable = true)
+ |-- title: string (nullable = true)
+ |-- region: string (nullable = true)
+ |-- language: string (nullable = true)
+ |-- types: string (nullable = true)
+ |-- attributes: string (nullable = true)
+ |-- isOriginalTitle: integer (nullable = true)
+
+  title_basics: 9 columns
+root
+ |-- tconst: string (nullable = true)
+ |-- titleType: string (nullable = true)
+ |-- primaryTitle: string (nullable = true)
+ |-- originalTitle: string (nullable = true)
+ |-- isAdult: integer (nullable = true)
+ |-- startYear: integer (nullable = true)
+ |-- endYear: integer (nullable = true)
+ |-- runtimeMinutes: integer (nullable = true)
+ |-- genres: string (nullable = true)
+
+  title_crew: 3 columns
+root
+ |-- tconst: string (nullable = true)
+ |-- directors: string (nullable = true)
+ |-- writers: string (nullable = true)
+
+  title_episode: 4 columns
+root
+ |-- tconst: string (nullable = true)
+ |-- parentTconst: string (nullable = true)
+ |-- seasonNumber: integer (nullable = true)
+ |-- episodeNumber: integer (nullable = true)
+
+  title_principals: 6 columns
+root
+ |-- tconst: string (nullable = true)
+ |-- ordering: integer (nullable = true)
+ |-- nconst: string (nullable = true)
+ |-- category: string (nullable = true)
+ |-- job: string (nullable = true)
+ |-- characters: string (nullable = true)
+
+  title_ratings: 3 columns
+root
+ |-- tconst: string (nullable = true)
+ |-- averageRating: float (nullable = true)
+ |-- numVotes: integer (nullable = true)
+
+
+>>> Query: bankable_directors
+Execution plan:
+== Physical Plan ==
+AdaptiveSparkPlan (45)
++- TakeOrderedAndProject (44)
+   +- Project (43)
+      +- SortMergeJoin Inner (42)
+         :- Sort (34)
+         :  +- Filter (33)
+         :     +- HashAggregate (32)
+         :        +- Exchange (31)
+         :           +- HashAggregate (30)
+         :              +- Project (29)
+         :                 +- SortMergeJoin Inner (28)
+         :                    :- Sort (21)
+         :                    :  +- Generate (20)
+         :                    :     +- SortMergeJoin LeftSemi (19)
+         :                    :        :- Filter (8)
+         :                    :        :  +- SortAggregate (7)
+         :                    :        :     +- Sort (6)
+         :                    :        :        +- Exchange (5)
+         :                    :        :           +- SortAggregate (4)
+         :                    :        :              +- Sort (3)
+         :                    :        :                 +- Filter (2)
+         :                    :        :                    +- Scan csv  (1)
+         :                    :        +- Project (18)
+         :                    :           +- Filter (17)
+         :                    :              +- SortAggregate (16)
+         :                    :                 +- Sort (15)
+         :                    :                    +- Exchange (14)
+         :                    :                       +- SortAggregate (13)
+         :                    :                          +- Sort (12)
+         :                    :                             +- Project (11)
+         :                    :                                +- Filter (10)
+         :                    :                                   +- Scan csv  (9)
+         :                    +- Sort (27)
+         :                       +- HashAggregate (26)
+         :                          +- Exchange (25)
+         :                             +- HashAggregate (24)
+         :                                +- Filter (23)
+         :                                   +- Scan csv  (22)
+         +- SortAggregate (41)
+            +- Sort (40)
+               +- Exchange (39)
+                  +- SortAggregate (38)
+                     +- Sort (37)
+                        +- Filter (36)
+                           +- Scan csv  (35)
+
+
+(1) Scan csv 
+Output [2]: [tconst#46, directors#47]
+Batched: false
+Location: InMemoryFileIndex [file:/app/data/title.crew.tsv]
+PushedFilters: [IsNotNull(tconst)]
+ReadSchema: struct<tconst:string,directors:string>
+
+(2) Filter
+Input [2]: [tconst#46, directors#47]
+Condition : (atleastnnonnulls(1, tconst#46) AND isnotnull(tconst#46))
+
+(3) Sort
+Input [2]: [tconst#46, directors#47]
+Arguments: [tconst#46 ASC NULLS FIRST], false, 0
+
+(4) SortAggregate
+Input [2]: [tconst#46, directors#47]
+Keys [1]: [tconst#46]
+Functions [1]: [partial_first(directors#47, false)]
+Aggregate Attributes [2]: [first#232, valueSet#233]
+Results [3]: [tconst#46, first#234, valueSet#235]
+
+(5) Exchange
+Input [3]: [tconst#46, first#234, valueSet#235]
+Arguments: hashpartitioning(tconst#46, 100), ENSURE_REQUIREMENTS, [plan_id=130]
+
+(6) Sort
+Input [3]: [tconst#46, first#234, valueSet#235]
+Arguments: [tconst#46 ASC NULLS FIRST], false, 0
+
+(7) SortAggregate
+Input [3]: [tconst#46, first#234, valueSet#235]
+Keys [1]: [tconst#46]
+Functions [1]: [first(directors#47, false)]
+Aggregate Attributes [1]: [first(directors#47)()#190]
+Results [2]: [tconst#46, first(directors#47)()#190 AS directors#191]
+
+(8) Filter
+Input [2]: [tconst#46, directors#191]
+Condition : isnotnull(directors#191)
+
+(9) Scan csv 
+Output [3]: [tconst#28, titleType#29, primaryTitle#30]
+Batched: false
+Location: InMemoryFileIndex [file:/app/data/title.basics.tsv]
+PushedFilters: [IsNotNull(tconst)]
+ReadSchema: struct<tconst:string,titleType:string,primaryTitle:string>
+
+(10) Filter
+Input [3]: [tconst#28, titleType#29, primaryTitle#30]
+Condition : ((atleastnnonnulls(2, tconst#28, primaryTitle#30) AND atleastnnonnulls(1, tconst#28)) AND isnotnull(tconst#28))
+
+(11) Project
+Output [2]: [tconst#28, titleType#29]
+Input [3]: [tconst#28, titleType#29, primaryTitle#30]
+
+(12) Sort
+Input [2]: [tconst#28, titleType#29]
+Arguments: [tconst#28 ASC NULLS FIRST], false, 0
+
+(13) SortAggregate
+Input [2]: [tconst#28, titleType#29]
+Keys [1]: [tconst#28]
+Functions [1]: [partial_first(titleType#29, false)]
+Aggregate Attributes [2]: [first#236, valueSet#237]
+Results [3]: [tconst#28, first#238, valueSet#239]
+
+(14) Exchange
+Input [3]: [tconst#28, first#238, valueSet#239]
+Arguments: hashpartitioning(tconst#28, 100), ENSURE_REQUIREMENTS, [plan_id=137]
+
+(15) Sort
+Input [3]: [tconst#28, first#238, valueSet#239]
+Arguments: [tconst#28 ASC NULLS FIRST], false, 0
+
+(16) SortAggregate
+Input [3]: [tconst#28, first#238, valueSet#239]
+Keys [1]: [tconst#28]
+Functions [1]: [first(titleType#29, false)]
+Aggregate Attributes [1]: [first(titleType#29)()#194]
+Results [2]: [tconst#28, first(titleType#29)()#194 AS titleType#195]
+
+(17) Filter
+Input [2]: [tconst#28, titleType#195]
+Condition : titleType#195 IN (movie,tvSeries,tvMiniSeries,tvMovie)
+
+(18) Project
+Output [1]: [tconst#28]
+Input [2]: [tconst#28, titleType#195]
+
+(19) SortMergeJoin
+Left keys [1]: [tconst#46]
+Right keys [1]: [tconst#28]
+Join type: LeftSemi
+Join condition: None
+
+(20) Generate
+Input [2]: [tconst#46, directors#191]
+Arguments: explode(split(directors#191, ,, -1)), [tconst#46], false, [director_id#141]
+
+(21) Sort
+Input [2]: [tconst#46, director_id#141]
+Arguments: [tconst#46 ASC NULLS FIRST], false, 0
+
+(22) Scan csv 
+Output [3]: [tconst#72, averageRating#73, numVotes#74]
+Batched: false
+Location: InMemoryFileIndex [file:/app/data/title.ratings.tsv]
+PushedFilters: [IsNotNull(tconst)]
+ReadSchema: struct<tconst:string,averageRating:float,numVotes:int>
+
+(23) Filter
+Input [3]: [tconst#72, averageRating#73, numVotes#74]
+Condition : (atleastnnonnulls(1, tconst#72) AND isnotnull(tconst#72))
+
+(24) HashAggregate
+Input [3]: [tconst#72, averageRating#73, numVotes#74]
+Keys [1]: [tconst#72]
+Functions [2]: [partial_first(averageRating#73, false), partial_first(numVotes#74, false)]
+Aggregate Attributes [4]: [first#240, valueSet#241, first#242, valueSet#243]
+Results [5]: [tconst#72, first#244, valueSet#245, first#246, valueSet#247]
+
+(25) Exchange
+Input [5]: [tconst#72, first#244, valueSet#245, first#246, valueSet#247]
+Arguments: hashpartitioning(tconst#72, 100), ENSURE_REQUIREMENTS, [plan_id=145]
+
+(26) HashAggregate
+Input [5]: [tconst#72, first#244, valueSet#245, first#246, valueSet#247]
+Keys [1]: [tconst#72]
+Functions [2]: [first(averageRating#73, false), first(numVotes#74, false)]
+Aggregate Attributes [2]: [first(averageRating#73)()#208, first(numVotes#74)()#210]
+Results [3]: [tconst#72, first(averageRating#73)()#208 AS averageRating#209, first(numVotes#74)()#210 AS numVotes#211]
+
+(27) Sort
+Input [3]: [tconst#72, averageRating#209, numVotes#211]
+Arguments: [tconst#72 ASC NULLS FIRST], false, 0
+
+(28) SortMergeJoin
+Left keys [1]: [tconst#46]
+Right keys [1]: [tconst#72]
+Join type: Inner
+Join condition: None
+
+(29) Project
+Output [4]: [tconst#46, director_id#141, averageRating#209, numVotes#211]
+Input [5]: [tconst#46, director_id#141, tconst#72, averageRating#209, numVotes#211]
+
+(30) HashAggregate
+Input [4]: [tconst#46, director_id#141, averageRating#209, numVotes#211]
+Keys [1]: [director_id#141]
+Functions [3]: [partial_count(tconst#46), partial_avg(averageRating#209), partial_avg(numVotes#211)]
+Aggregate Attributes [5]: [count#222L, sum#223, count#224L, sum#225, count#226L]
+Results [6]: [director_id#141, count#227L, sum#228, count#229L, sum#230, count#231L]
+
+(31) Exchange
+Input [6]: [director_id#141, count#227L, sum#228, count#229L, sum#230, count#231L]
+Arguments: hashpartitioning(director_id#141, 100), ENSURE_REQUIREMENTS, [plan_id=155]
+
+(32) HashAggregate
+Input [6]: [director_id#141, count#227L, sum#228, count#229L, sum#230, count#231L]
+Keys [1]: [director_id#141]
+Functions [3]: [count(tconst#46), avg(averageRating#209), avg(numVotes#211)]
+Aggregate Attributes [3]: [count(tconst#46)#156L, avg(averageRating#209)#158, avg(numVotes#211)#160]
+Results [4]: [director_id#141, count(tconst#46)#156L AS title_count#157L, round(avg(averageRating#209)#158, 2) AS avg_rating#159, round(avg(numVotes#211)#160, 0) AS avg_votes#161]
+
+(33) Filter
+Input [4]: [director_id#141, title_count#157L, avg_rating#159, avg_votes#161]
+Condition : ((isnotnull(avg_rating#159) AND isnotnull(avg_votes#161)) AND ((title_count#157L >= 10) AND ((avg_rating#159 >= 7.0) AND (avg_votes#161 >= 50000.0))))
+
+(34) Sort
+Input [4]: [director_id#141, title_count#157L, avg_rating#159, avg_votes#161]
+Arguments: [director_id#141 ASC NULLS FIRST], false, 0
+
+(35) Scan csv 
+Output [2]: [nconst#0, primaryName#1]
+Batched: false
+Location: InMemoryFileIndex [file:/app/data/name.basics.tsv]
+PushedFilters: [IsNotNull(nconst)]
+ReadSchema: struct<nconst:string,primaryName:string>
+
+(36) Filter
+Input [2]: [nconst#0, primaryName#1]
+Condition : (atleastnnonnulls(2, nconst#0, primaryName#1) AND isnotnull(nconst#0))
+
+(37) Sort
+Input [2]: [nconst#0, primaryName#1]
+Arguments: [nconst#0 ASC NULLS FIRST], false, 0
+
+(38) SortAggregate
+Input [2]: [nconst#0, primaryName#1]
+Keys [1]: [nconst#0]
+Functions [1]: [partial_first(primaryName#1, false)]
+Aggregate Attributes [2]: [first#248, valueSet#249]
+Results [3]: [nconst#0, first#250, valueSet#251]
+
+(39) Exchange
+Input [3]: [nconst#0, first#250, valueSet#251]
+Arguments: hashpartitioning(nconst#0, 100), ENSURE_REQUIREMENTS, [plan_id=161]
+
+(40) Sort
+Input [3]: [nconst#0, first#250, valueSet#251]
+Arguments: [nconst#0 ASC NULLS FIRST], false, 0
+
+(41) SortAggregate
+Input [3]: [nconst#0, first#250, valueSet#251]
+Keys [1]: [nconst#0]
+Functions [1]: [first(primaryName#1, false)]
+Aggregate Attributes [1]: [first(primaryName#1)()#212]
+Results [2]: [nconst#0, first(primaryName#1)()#212 AS primaryName#213]
+
+(42) SortMergeJoin
+Left keys [1]: [director_id#141]
+Right keys [1]: [nconst#0]
+Join type: Inner
+Join condition: None
+
+(43) Project
+Output [4]: [primaryName#213, title_count#157L, avg_rating#159, avg_votes#161]
+Input [6]: [director_id#141, title_count#157L, avg_rating#159, avg_votes#161, nconst#0, primaryName#213]
+
+(44) TakeOrderedAndProject
+Input [4]: [primaryName#213, title_count#157L, avg_rating#159, avg_votes#161]
+Arguments: 50, [avg_rating#159 DESC NULLS LAST, avg_votes#161 DESC NULLS LAST], [primaryName#213, title_count#157L, avg_rating#159, avg_votes#161]
+
+(45) AdaptiveSparkPlan
+Output [4]: [primaryName#213, title_count#157L, avg_rating#159, avg_votes#161]
+Arguments: isFinalPlan=false
+
+
